@@ -1,0 +1,23 @@
+<div class="container">
+	<div class="card {% if not blog_post.publish_date %} border border-warning text-dark {% endif %}">
+	    <div class="card-body">
+	    	<img class="rounded-circle article-img" src="{{ blog_post.user.profile.image.url }}" width="50" height="50"> &nbsp;
+	    	<a class="mr-2">{{ blog_post.user }}</a>
+            <small class="text-muted">{{ blog_post.publish_date }}</small>
+	    	<div class="border-top pt-3">
+		        <h5 class="card-title">{{blog_post.title}}</h5>
+		        <p class="card-text">
+		        	{{blog_post.content|linebreaks|truncatewords:30}}
+		        </p>
+		        {% if blog_post.image %}
+		    		<a href="{{blog_post.get_absolute_url}}">
+		    			<img src="{{ blog_post.image.url }}" class="card-img-top" >
+		    		</a>
+		    	{% endif %}
+		        {% if not blog_post.publish_date %} Draft {% endif %}
+		        <a href="{{blog_post.get_absolute_url}}">View</a><br><br>
+		        <p>Comments: {{ blog_post.comments.count }}</p>
+		    </div>
+	    </div>
+	</div>
+</div>

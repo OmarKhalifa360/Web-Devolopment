@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <title>Blog</title>
+  </head>
+  <body>
+    {% include "navbar.html" %}
+    {% load crispy_forms_tags %}
+  	<div class="container">
+    		{% block content %}
+              <div class="col-12">
+                <br>
+                  <div class="card">
+                    <div class="card-body">
+                      <div class="container">
+                      <article class="media content-section">
+                        <div class="media-body">
+                          <div class="article-metadata">
+                            <img class="rounded-circle article-img" src="{{ object.user.profile.image.url }}" width="50" height="50">
+                            <a class="mr-2">{{ object.user }}</a>
+                            <small class="text-muted">{{ object.publish_date }}</small>
+                          </div>
+                        <div class="border-top pt-3">
+                        <h2 class="article-title">{{object.title}}</h2><br>
+                        <p class="article-content">{{object.content|linebreaks}}</p><br>
+                        <a href="#" onClick="document.getElementById('likebutton').submit()">Like: </a> {{object.likes.count}}   |   <a href="#" onClick="document.getElementById('dislikebutton').submit()">Dislike: </a>{{object.dislikes.count}}
+                        <form id="likebutton" method="POST" action="/blog/{{object.slug}}/like/">
+                        {% csrf_token %}
+                        <input type="hidden">
+                        </form>
+
+                        <form id="dislikebutton" method="POST" action="/blog/{{object.slug}}/dislike/">
+                        {% csrf_token %}
+                        <input type="hidden">
+                        </form> <br>
+                          {% if request.user == object.user %}
+                            <a href="{{object.get_edit_url}}" class="btn btn-outline-info">Edit</a>&nbsp;&nbsp;
+                            <a href="{{object.get_delete_url}}" class="btn btn-outline-info">Delete</a><br>
+                            <br><div class="border-top pt-3">
+                            <h5>Comments</h5>
+                            <br>{% for comment in object.comments.all %}
+                                  <div class="card">
+                                    <div class="card-body">
+                                      <div class="comment">
+                                        <img class="rounded-circle article-img" src="{{ comment.author.profile.image.url }}" width="50" height="50"><br>
+                                          <p class="font-weight-bold">
+                                            {{ comment.author }} |
+                                            <span class=" text-muted font-weight-normal">
+                                              {{ comment.created_date }}
+                                            </span>
+                                          </p>
+                                          {{ comment.content | linebreaks }}<br>
+                                          <a href="#" onClick="document.getElementById('likebutton').submit()">Like: </a> {{comment.likes.count}}   |   <a href="#" onClick="document.getElementById('dislikebutton').submit()">Dislike: </a>{{comment.dislikes.count}}
+                                          <form id="likebutton" method="POST" action="/blog/{{object.slug}}/comment/like/">
+                                          {% csrf_token %}
+                                          <input type="hidden">
+                                          </form>
+
+                                          <form id="dislikebutton" method="POST" action="/blog/{{object.slug}}/comment/dislike/">
+                                          {% csrf_token %}
+                                          <input type="hidden">
+                                          </form>
+                                          <br> <!--{{comment.reply}}-->
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <br>
+                                {% empty %}
+                                  <p>No comments here yet :(</p>
+                                {% endfor %}
+                                <form method="POST" class="form-inline" style="margin-top: 1.3em;">
+                                  <!-- <textarea style="width:100%; height:80px; resize:none;" class="form-control" name="content" required="required"></textarea><br><br> -->
+                                  {{ comment_form.as_p }}
+                                  {% csrf_token %}
+                                  <br><br><button class="btn btn-outline-info" type="submit">Comment</button>
+                            </form>
+                          {% else %}
+                            <div class="border-top pt-3">
+                            <h5>Comments</h5>
+                              <br>{% for comment in object.comments.all %}
+                                <div class="comment">
+                                  <div class="card">
+                                    <div class="card-body">
+                                      <div class="comment">
+                                      <img class="rounded-circle article-img" src="{{ comment.author.profile.image.url }}" width="50" height="50"><br>
+                                          <p class="font-weight-bold">
+                                            {{ comment.author }} |
+                                            <span class=" text-muted font-weight-normal">
+                                              {{ comment.created_date }}
+                                            </span>
+                                          </p>
+                                          {{ comment.content | linebreaks }}<br>
+                                          <a href="#" onClick="document.getElementById('likebutton').submit()">Like: </a> {{comment.likes.count}}   |   <a href="#" onClick="document.getElementById('dislikebutton').submit()">Dislike: </a>{{comment.dislikes.count}}
+                                          <form id="likebutton" method="POST" action="/blog/{{object.slug}}/comment/like/">
+                                          {% csrf_token %}
+                                          <input type="hidden">
+                                          </form>
+
+                                          <form id="dislikebutton" method="POST" action="/blog/{{object.slug}}/comment/dislike/">
+                                          {% csrf_token %}
+                                          <input type="hidden">
+                                          </form>
+                                          <br>{{comment.reply}}
+                                        </div>
+                                    </div>
+                                  </div><br>
+                                {% empty %}
+                                  <p>No comments here yet :(</p>
+                                {% endfor %}
+                                <br><form method="POST" class="post-form">{% csrf_token %}
+                                  {{ comment_form.as_p }}
+                                  <button class="btn btn-outline-info" type="submit">Comment</button>
+                              </form>
+                          {% endif %}
+                        </div>
+                        </div>
+                      </article>
+                    </div>
+                  </div>
+        {% endblock %}
+	  </div>
+    <br>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+  </body>
+</html>
